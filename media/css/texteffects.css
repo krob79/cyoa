@@ -1,0 +1,83 @@
+@keyframes horizontal-shaking {
+ 0% { transform: translateX(0) }
+ 25% { transform: translateX(5px) }
+ 50% { transform: translateX(-5px) }
+ 75% { transform: translateX(5px) }
+ 100% { transform: translateX(0) }
+}
+
+@keyframes tilt-n-move-shaking {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(5px, 5px) rotate(5deg); }
+  50% { transform: translate(0, 0) rotate(0eg); }
+  75% { transform: translate(-5px, 5px) rotate(-5deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+.strong-tilt-move-shake {
+  animation: tilt-n-move-shaking 0.15s infinite;
+}
+
+.horizontal-shake {
+    animation: horizontal-shaking 0.35s infinite;
+}
+
+/* Experimental text fade in effect */
+.fadein span{
+    animation:fadein 100ms linear;
+    animation-fill-mode: forwards;
+    display:inline-block;
+    
+    text-indent: 0px; 
+    width:9.5px;
+}
+@keyframes fadein{
+    0%{opacity: 0;}
+    50%{opacity: 1; transform:translateY(-2px);} 
+    100%{opacity: 1; transform:translateY(2px);} 
+/*    50%{transform:skewY(2.9deg) skewX(-2.9deg) scale(1.006);} */
+}
+
+/* Experimental text jitter effect */
+.jittery span{
+    animation:jitter 200ms linear infinite;
+    color:#f06d06;
+    display:inline-block;
+    
+/*    test stuff*/
+    text-indent: 0px; 
+    width:11px;
+}
+@keyframes jitter{
+    0%{transform:translateX(-1px) scale(1.006);}
+    50%{transform:translateY(-5px) translateX(1px) scale(1.5);} 
+    100%{transform:translateY(5px) translateX(-1px) scale(1.5);} 
+/*    50%{transform:skewY(2.9deg) skewX(-2.9deg) scale(1.006);} */
+}
+
+/* Experimental text shake  */
+/* https://css-tricks.com/snippets/css/shake-css-keyframe-animation/ */
+.shakeeffect {
+  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-4px, 0, 0);
+  }
+  
+  20%, 80% {
+    transform: translate3d(8px, 0, 0);
+  }
+
+  30%, 50%, 70% {
+    transform: translate3d(-16px, 0, 0);
+  }
+
+  40%, 60% {
+    transform: translate3d(16px, 0, 0);
+  }
+}
