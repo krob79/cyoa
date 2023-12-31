@@ -171,7 +171,7 @@ function writeNodeContent(travelManager, nodeID){
             //Write the text intended to display after the images, narration or in a word bubble
             if(after != ''){  
                //writeContent(`<p class='${currentSubject.textclass}'>${after}</p>`);    
-               nodeContent +=`<p class='${currentSubject.textclass}'>${after}</p>`;
+               nodeContent +=`<p class='${currentSubject.textclass}'></p>`;
                 //nodeContent +=`<p class='${currentSubject.textclass}'></p>`;
             }
             //DISPLAY FILTERED CHOICES FROM NODE!
