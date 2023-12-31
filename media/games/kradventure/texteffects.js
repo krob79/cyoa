@@ -1,7 +1,9 @@
 //https://codepen.io/zerospree/pen/GRmBga
-function runJitter(el){
-  var $jittery = el.textContent,
-      aText    = $jittery.text().split(''),
+function runJitter(eleRef){
+    let el = document.querySelectorAll(eleRef);
+  let lastEl = el[el.length-1];
+  let $jittery = lastEl.textContent,
+      aText    = $jittery.split(''),
       letters = '';
   
   for(var i = 0; i < aText.length; i++){

@@ -156,19 +156,19 @@ function writeNodeContent(travelManager, nodeID){
             let before = replaceBracketValues(result.before);
             let after = replaceBracketValues(result.after);
             
-            //Write the text intended to display before the images
+            //Write any text intended to display before the images
             if(before != ''){
                //writeContent(before);
                nodeContent += before;
             }
             
-            //Write the image tags for the background image and character image, if available
+            //Write any image tags intended for the background image and character image, if available
             if(imageMarkup != ''){
                //writeContent(imageMarkup);
                nodeContent += imageMarkup;
             }
             
-            //Write the text intended to display after the images
+            //Write the text intended to display after the images, narration or in a word bubble
             if(after != ''){  
                //writeContent(`<p class='${currentSubject.textclass}'>${after}</p>`);    
                nodeContent +=`<p class='${currentSubject.textclass}'>${after}</p>`;
@@ -183,9 +183,10 @@ function writeNodeContent(travelManager, nodeID){
                 //get the last word bubble element  
                 let el = document.querySelectorAll('.characterbox');
                 let lastEl = el[el.length-1];
+                console.log(`---CHECKING THE 'lastEl' TEXT - ${after}`);
                 //make sure to run the effect on ONLY the last bubble, because the text effect code only works on the FIRST element if multiple elements are gathered.
                 try{
-                    if(lastEl.length > 1){
+                    if(lastEl){
                        runTextEffect2(after);
                     }else{
                         nodeContent += after;
@@ -196,23 +197,6 @@ function writeNodeContent(travelManager, nodeID){
                     console.log(`ERROR WITH TEXT EFFECTS! ${e}`);
                 }
                 
-            
-            
-            
-            
-            //this will probably not stay - there's most likely a better way to transition between Nodes
-            
-            //content.innerHTML = nodeContent;
-//            content.style.opacity = 0;
-//            setTimeout(function(){
-//                content.innerHTML = "";
-//                content.innerHTML = nodeContent;
-//                content.style.opacity = 1;
-//            }, 1000);
-            
-            
-            //console.log("---------------------------------");
-            //console.log(nodeContent);
 }
 
 
