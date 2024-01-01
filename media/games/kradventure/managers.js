@@ -48,6 +48,9 @@ content.addEventListener('modalevent', function(e){
     modalText.classList.add('modal-text');
     modalText.innerHTML = e.detail.desc;
     
+    //example: {evtname:'promptevent', detail:{promptType:'input', action:'create', promptText:'Who the heck are you, anyway?', processNode:'1112', cancelNode:'1113', value:'gameplayer.name'}}
+    
+    //if there is a prompt in the modalEvent, we will add an input field, a submit button, and a cancel button
     if(e.detail.prompt){
        //create input field with prompt text
         let prompt = document.createElement('input');
@@ -66,6 +69,16 @@ content.addEventListener('modalevent', function(e){
         let modalSubmit = document.createElement('span');
         modalSubmit.classList.add('modal-btn');
         modalSubmit.innerHTML = `Submit`;
+        modalSubmit.onclick = function() {
+            console.log("---submitting input from button");
+            processPrompt(e.detail.prompt);
+            linkDispatchEvent(0);
+            modalDiv.style.display = "none";
+        }
+        
+        //change the "OK" button to say "Cancel" instead
+        modalClose.innerHTML = `Cancel`;
+        
         modalButtonSpace.appendChild(modalSubmit);
     }
     
@@ -87,6 +100,10 @@ content.addEventListener('modalevent', function(e){
     // When the user clicks on <span> (x), close the modal
     modalClose.onclick = function() {
         console.log("---closing modal from button");
+        if(e.detail.prompt){
+            linkDispatchEvent(1);
+            removePrompt();
+        }
         modalDiv.style.display = "none";
     }
 
@@ -231,10 +248,10 @@ content.addEventListener('promptevent', function(e){
     //console.log("---PROMPT EVENT HEARD---" + e.detail.promptType);
     console.log("---PROMPT EVENT HEARD---");
     travelManager.promptDetail = e.detail;
-    switch(travelManager.promptDetail.action){
+    switch(e.detail.action){
         case "create":
             //{evtname:'promptevent', detail:{promptType:'input', action:'create', promptText:'Who the heck are you, anyway?', processNode:'1112', cancelNode:'1113', value:'gameplayer.name'}}
-           content.dispatchEvent(new CustomEvent('modalevent', { detail: {desc:`${travelManager.promptDetail.promptText}`, prompt:true}}));
+           content.dispatchEvent(new CustomEvent('modalevent', { detail: {desc:`${e.detail.promptText}`, prompt:e.detail}}));
            //createPrompt(travelManager.promptDetail);
            break;
         case "process":
@@ -1013,8 +1030,13 @@ function comparePrompt(detail){
 
 function removePrompt(){
     gameplayer.prompt = "none";
-    let el = document.getElementById('promptdiv');
-    el.parentNode.removeChild(el);
+    let el = document.getElementById('myModal');
+    try{
+        content.removeChild(el);
+    }catch(e){
+        console.log("---ERROR WITH MODAL REMOVAL: " + e);
+    }
+    
 }
 
 function addTimer(seconds, timerEventName){
