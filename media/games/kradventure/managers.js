@@ -50,6 +50,8 @@ content.addEventListener('modalevent', function(e){
     
     //example: {evtname:'promptevent', detail:{promptType:'input', action:'create', promptText:'Who the heck are you, anyway?', processNode:'1112', cancelNode:'1113', value:'gameplayer.name'}}
     
+    //example: {evtname:'promptevent', detail:{promptType:'compare', action:'create', promptText:'What is the secret password?', objString: [{value:'betty.password',resultNode:'1118'},{value:'poop',resultNode:'1121'},{value:'shit',resultNode:'1121'}], defaultNode:'1119', cancelNode: '1120'}}
+    
     //if there is a prompt in the modalEvent, we will add an input field, a submit button, and a cancel button
     if(e.detail.prompt){
        //create input field with prompt text
@@ -70,9 +72,14 @@ content.addEventListener('modalevent', function(e){
         modalSubmit.classList.add('modal-btn');
         modalSubmit.innerHTML = `Submit`;
         modalSubmit.onclick = function() {
-            console.log("---submitting input from button");
-            processPrompt(e.detail.prompt);
-            linkDispatchEvent(0);
+            //console.log(`---submitting input from button ${e.detail.prompt.objString} `);
+            if(e.detail.prompt.objString){
+                content.dispatchEvent(new CustomEvent('changenode', { detail: {destination:comparePrompt(e.detail)}}));
+            }else{
+                processPrompt(e.detail.prompt);
+                linkDispatchEvent(0);
+            }
+            
             modalDiv.style.display = "none";
         }
         
@@ -100,6 +107,7 @@ content.addEventListener('modalevent', function(e){
     // When the user clicks on <span> (x), close the modal
     modalClose.onclick = function() {
         console.log("---closing modal from button");
+        //not sure if this code is what needs to be here...but it seems to work for now
         if(e.detail.prompt){
             linkDispatchEvent(1);
             removePrompt();
@@ -110,8 +118,13 @@ content.addEventListener('modalevent', function(e){
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function(event) {
       if (event.target == modalDiv) {
-          console.log("---closing modal");
-          modalDiv.style.display = "none";
+        console.log("---closing modal from BG");
+        //not sure if this code is what needs to be here...but it seems to work for now
+        if(e.detail.prompt){
+            linkDispatchEvent(1);
+            removePrompt();
+        }
+        modalDiv.style.display = "none";
       }
     }
     
@@ -335,32 +348,20 @@ content.addEventListener('nodelink', function(e){
         
         let playerChoice = travelManager.currentNode.obj.player_choices[e.detail.num]; //travelManager.currentNode.obj.player_choices[num]
         //console.log("---NODE LINK EVT LISTENER - player destination is: " + playerChoice.destination);
-        
-        travelManager.nodeToLoad = playerChoice.destination;
-
-        if(gameplayer.prompt == "input"){
-            //console.log(`COMPARING Destination ${playerChoice.destination} with processNode ${travelManager.promptDetail.processNode} or cancelNode ${travelManager.promptDetail.cancelNode}`);
-            
-            if(playerChoice.destination == travelManager.promptDetail.processNode){
-               processPrompt(travelManager.promptDetail);
-            }else if(playerChoice.destination == travelManager.promptDetail.cancelNode){
-               removePrompt();    
-            }
-            
-        }else if(gameplayer.prompt == "compare"){
-            switch(e.detail.num){
-                case 0:
-                    travelManager.nodeToLoad = comparePrompt(travelManager.promptDetail);
-                    break;
-                case 1:
-                    removePrompt();
-                    break;
-            }   
-        }
-        fadeConvoList();
-        writeNodeContent(travelManager, travelManager.nodeToLoad);
+    
+        content.dispatchEvent(new CustomEvent('changenode', { detail: {destination:playerChoice.destination}}));
+    
     }
 );
+
+content.addEventListener('changenode', function(e){
+        //console.log("---CHANGENODE EVENT!!!");
+        //setting nodeToLoad does a lot of things as a setter!
+        travelManager.nodeToLoad = e.detail.destination;
+        fadeConvoList();
+        writeNodeContent(travelManager, travelManager.nodeToLoad);
+    
+});
 
 //dispatched as Node loads - immediately activates combat mode, gets an opponent battle choice ready, and prompts the clicker
 content.addEventListener('combat', function(e){

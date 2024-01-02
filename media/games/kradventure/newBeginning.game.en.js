@@ -151,8 +151,9 @@ function writeNodeContent(travelManager, nodeID){
             //console.log(`----Current Subject: ${tm.currentSubject.id} - ${tm.nodeToLoad}`);
             tm.currentNode = currentSubject.getNode(nodeID, tm);
             
+            //checks the <p> tags in the text to break them apart so the images can be inbetween
             let result = tm.currentNode.obj.separateText();
-            //replace any references to variables in the text. Ex: "Hi, my name is {name}!"
+            //fill in any references to variables in the text with the actual value. Ex: "Hi, my name is {name}!"
             let before = replaceBracketValues(result.before);
             let after = replaceBracketValues(result.after);
             
@@ -183,7 +184,7 @@ function writeNodeContent(travelManager, nodeID){
                 //get the last word bubble element  
                 let el = document.querySelectorAll('.characterbox');
                 let lastEl = el[el.length-1];
-                console.log(`---CHECKING THE 'lastEl' TEXT - ${after}`);
+                //console.log(`---CHECKING THE 'lastEl' TEXT - ${after}`);
                 //make sure to run the effect on ONLY the last bubble, because the text effect code only works on the FIRST element if multiple elements are gathered.
                 try{
                     if(lastEl){
