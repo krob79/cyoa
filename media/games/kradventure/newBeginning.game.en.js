@@ -136,6 +136,7 @@ function writeNodeContent(travelManager, nodeID){
             let currentSubject = tm.currentSubject;
             let imageMarkup = tm.currentImageMarkup;
             let content = document.querySelector('#content');
+            let clicks = 0;
             
             //system.setCharacterText(`<p>You are at ${tm.currentLocation.title}</p>`);
             nodeContent += `<h1>${tm.currentLocation.title}</h1>`;
@@ -179,6 +180,8 @@ function writeNodeContent(travelManager, nodeID){
             //writeContent(tm.currentNode.choicetxt); 
             nodeContent += `${tm.currentNode.choicetxt}`; 
             content.innerHTML = nodeContent;
+    
+            
             
                 //RUN TEXT EFFECTS!!!
                 //get the last word bubble element  
@@ -189,6 +192,16 @@ function writeNodeContent(travelManager, nodeID){
                 try{
                     if(lastEl){
                        runTextEffect2(after);
+                        content.onclick = function(){
+                            console.log(`-----CLICK CLICK! ${clicks}`);
+                            clicks++;
+                            if(clicks > 1){
+                               console.log(`--Clicks is now ${clicks} removingTypeEffects`);
+                               lastEl.textContent = "";
+                               lastEl.textContent = removeTypeEffects(after);
+                            }
+                            
+                        }
                     }else{
                         nodeContent += after;
                     }
@@ -197,6 +210,8 @@ function writeNodeContent(travelManager, nodeID){
                 }catch(e){
                     console.log(`ERROR WITH TEXT EFFECTS! ${e}`);
                 }
+    
+                
                 
 }
 

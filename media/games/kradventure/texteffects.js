@@ -155,23 +155,23 @@ function runJitter(eleRef){
 //}
 
 let effectQueue = [];
+let effectController = {active:true};
 let currentSpeed = 50;
 let isTyping = false;
 
-function runTextEffect2(el){
+function runTextEffect2(txt){
     //console.log("----TESTING 10/02");
     /*
     the split array is created using the "|" character and the use of "|" assumes that multiple effects need to be applied to the text
     if no "|" is used, the split array should just have one element consisting of the whole text
     */
-    var split = el.split("|");
+    var split = txt.split("|");
     let tsplit;
     let textPiece = '';
-    let totalText = '';
     let overwriteTotalText = false;
     let currentSplitPiece = 0;
     let currentSpeed = 50;
-    let txt = el.textContent;
+    //let txt = txt.textContent;
     
     //the idea here is to hide the choices until the text is finished, but maybe disable this until we have a reliable way of skipping the animation
     //displayChoiceList('none');
@@ -180,13 +180,15 @@ function runTextEffect2(el){
     if split.length = 1, then no "|" should have been found, therefore, no special TypeIt effects (other than the basic one) will be needed 
     */
     console.log(`---LENGTH: ${split.length}`);
+    effectController.active = true;
     if(split.length > 1){
         split.forEach((t,i) =>{
+            console.log("--pushing effect");
             effectQueue.push(t);
         });
         nextInQueue();
     }else{
-        typeSentence(el, '.characterbox', currentSpeed);
+        typeSentence(txt, '.characterbox', currentSpeed);
     }
 }
 
@@ -224,15 +226,17 @@ async function runSingleEffect(t){
 
 //just like the runTextEffects function, this function checks the special characters to see what effects WOULD have been applied,
 //however this function is re-assembling the text and removing all special characters, as if it was a plain, boring piece of text.
-function removeTypeEffects(el){
-    console.log("-----REMOVE TYPE EFFECTS");
-    let split = el.textContent.split("|");
-    let txt = el.textContent;
+function removeTypeEffects(txt){
+    console.log("-----REMOVING TYPE EFFECTS");
+    let split = txt.split("|");
     let tsplit = [];
-    let totalText = '';
+    let assembledText = '';
     let overwriteTotalText = false;
     let textPiece = '';
-    el.innerHTML = txt;
+    
+    //clear the queue so no further array elements cause the nextInQueue()
+    effectQueue = [];
+    effectController.active = false;
     
     //only go through the search of special characters if the text has been split up
     //otherwise, don't bother and leave it alone
@@ -251,10 +255,10 @@ function removeTypeEffects(el){
                 tsplit = t.split('*');
                 //get the word to delete and trim any white space
                 let txtToReplace = tsplit[1].trim();
-                //find the word in the totalText and replace with blank
-                let newText = totalText.replace(txtToReplace, '');
+                //find the word in the assembledText and replace with blank
+                let newText = assembledText.replace(txtToReplace, '');
                 //replace existing text with modified text
-                totalText = newText;
+                assembledText = newText;
                 //set to true so this part of the text isn't appended
                 overwriteTotalText = true;
 
@@ -279,18 +283,20 @@ function removeTypeEffects(el){
             was already made in a more complicated way!
             */
             if(!overwriteTotalText){
-               totalText += textPiece;
+               assembledText += textPiece;
             }else{
                overwriteTotalText = false; 
             }
 
-            //console.log("----SO FAR: " + totalText);
+            //console.log("----SO FAR: " + assembledText);
         });
     }else{
-        totalText = split[0];
+        assembledText = split[0];
     }
 
-    el.innerHTML = totalText;
+    //txt.innerHTML = assembledText;
+    console.log(`-----RESULT: ${assembledText}`);
+    return assembledText;
 }
 
 function displayChoiceList(cssSetting = 'block'){
@@ -301,15 +307,20 @@ function displayChoiceList(cssSetting = 'block'){
 }
 
 //experimental basic typing effect using async and Promises
-async function typeSentence(sentence, eleRef, speed = 50) {
+async function typeSentence(sentence, eleRef, speed = 50, controller = effectController) {
   let el = document.querySelectorAll(eleRef);
   let lastEl = el[el.length-1];
-  const letters = sentence.split("");
+  let letters = sentence.split("");
   let i = 0;
   while(i < letters.length) {
-    await waitForMs(speed);
-    lastEl.append(letters[i]);
-    i++
+      if(controller.active){
+         await waitForMs(speed);
+         lastEl.append(letters[i]);
+         i++
+      }else{
+        //letters = [];
+        return;  
+      }
   }
   //console.log("END OF TYPING");
   nextInQueue();
@@ -341,10 +352,10 @@ function waitForMs(ms) {
 }
 
 function nextInQueue(){
-    var shift = effectQueue.shift(); 
-    if(shift) { 
+    var nextEffect = effectQueue.shift(); 
+    if(nextEffect) { 
         isTyping = true;
-        runSingleEffect(shift);
+        runSingleEffect(nextEffect);
         //console.log("----running next function in queue");
     }else{
         isTyping = false;
