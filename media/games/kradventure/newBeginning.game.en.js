@@ -135,11 +135,15 @@ function writeNodeContent(travelManager, nodeID){
             let nodeContent = "";
             let currentSubject = tm.currentSubject;
             let imageMarkup = tm.currentImageMarkup;
+            let locationTitle = document.querySelector('#locationtitle');
+            let bgImage = document.querySelector('#bg');
             let content = document.querySelector('#content');
+            
             let clicks = 0;
             
             //system.setCharacterText(`<p>You are at ${tm.currentLocation.title}</p>`);
-            nodeContent += `<h1>${tm.currentLocation.title}</h1>`;
+            //nodeContent += `<h1>${tm.currentLocation.title}</h1>`;
+            locationTitle.innerHTML = `<h1>${tm.currentLocation.title}</h1>`;
             //nodeContent += `<p>${currentSubject.description}</p>`;
             
             //if there is one, and combat is not happenning, display the question/comment previously chosen by the player HERE instead.
@@ -167,7 +171,8 @@ function writeNodeContent(travelManager, nodeID){
             //Write any image tags intended for the background image and character image, if available
             if(imageMarkup != ''){
                //writeContent(imageMarkup);
-               nodeContent += imageMarkup;
+               //nodeContent += imageMarkup;
+               bgImage.innerHTML = imageMarkup;
             }
             
             //Write the text intended to display after the images, narration or in a word bubble
@@ -181,35 +186,33 @@ function writeNodeContent(travelManager, nodeID){
             nodeContent += `${tm.currentNode.choicetxt}`; 
             content.innerHTML = nodeContent;
     
-            
-            
-                //RUN TEXT EFFECTS!!!
-                //get the last word bubble element  
-                let el = document.querySelectorAll('.characterbox');
-                let lastEl = el[el.length-1];
-                //console.log(`---CHECKING THE 'lastEl' TEXT - ${after}`);
-                //make sure to run the effect on ONLY the last bubble, because the text effect code only works on the FIRST element if multiple elements are gathered.
-                try{
-                    if(lastEl){
-                       runTextEffect2(after);
-                        content.onclick = function(){
-                            console.log(`-----CLICK CLICK! ${clicks}`);
-                            clicks++;
-                            if(clicks > 1){
-                               console.log(`--Clicks is now ${clicks} removingTypeEffects`);
-                               lastEl.textContent = "";
-                               lastEl.textContent = removeTypeEffects(after);
-                            }
-                            
+            //RUN TEXT EFFECTS!!!
+            //get the last word bubble element  
+            let el = document.querySelectorAll('.characterbox');
+            let lastEl = el[el.length-1];
+            //console.log(`---CHECKING THE 'lastEl' TEXT - ${after}`);
+            //make sure to run the effect on ONLY the last bubble, because the text effect code only works on the FIRST element if multiple elements are gathered.
+            try{
+                if(lastEl){
+                   runTextEffect2(after);
+                    content.onclick = function(){
+                        console.log(`-----CLICK CLICK! ${clicks}`);
+                        clicks++;
+                        if(clicks > 1){
+                           console.log(`--Clicks is now ${clicks} removingTypeEffects`);
+                           lastEl.textContent = "";
+                           lastEl.textContent = removeTypeEffects(after);
                         }
-                    }else{
-                        nodeContent += after;
-                    }
-                    
 
-                }catch(e){
-                    console.log(`ERROR WITH TEXT EFFECTS! ${e}`);
+                    }
+                }else{
+                    nodeContent += after;
                 }
+
+
+            }catch(e){
+                console.log(`ERROR WITH TEXT EFFECTS! ${e}`);
+            }
     
                 
                 

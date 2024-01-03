@@ -363,3 +363,33 @@ function nextInQueue(){
     }
     
 }
+
+//taken directly from Undum code, with some things commented out
+//does the fadeout, plus slide up effect
+function animateAway(){
+        var contentToHide = $('#content .transient, #content ul.options');
+        contentToHide.add($("#content a").filter(function(){
+            return $(this).attr("href").match(/[?&]transient[=&]?/);
+        }));
+        //if (interactive) {
+            //if (mobile) {
+              //contentToHide.fadeOut(system.options.mobile_hide_speed);
+            //} else {
+                    // Get fate out speed of options, and slide up speed variables.
+              contentToHide.
+                animate({opacity: 0}, 2000).
+                slideUp(2000, function() {
+                  $(this).remove();
+                });
+            //}
+        //} else {
+            //contentToHide.remove();
+        //}
+        //  Remove links and transient sections.
+        $('#content a').each(function(index, element) {
+            var a = $(element);
+            if (a.hasClass('sticky') || a.attr("href").match(/[?&]sticky[=&]?/))
+                return;
+            a.replaceWith($("<span>").addClass("ex_link").html(a.html()));
+        });
+}
