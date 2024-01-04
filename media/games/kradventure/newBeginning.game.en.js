@@ -135,7 +135,7 @@ function writeNodeContent(travelManager, nodeID){
             let nodeContent = "";
             let currentSubject = tm.currentSubject;
             let imageMarkup = tm.currentImageMarkup;
-            let locationTitle = document.querySelector('#locationtitle');
+            let locationTitle = document.querySelector('#locationTitle');
             let bgImage = document.querySelector('#bg');
             let content = document.querySelector('#content');
             
