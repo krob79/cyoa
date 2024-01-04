@@ -156,8 +156,11 @@ function writeNodeContent(travelManager, nodeID){
             //console.log(`----Current Subject: ${tm.currentSubject.id} - ${tm.nodeToLoad}`);
             tm.currentNode = currentSubject.getNode(nodeID, tm);
             
+            //Add or Remove dynamic <span> tags!
+            let spanReviewedText = tm.reviewSpanTags(tm.currentNode.obj.text);
+    
             //checks the <p> tags in the text to break them apart so the images can be inbetween
-            let result = tm.currentNode.obj.separateText();
+            let result = tm.currentNode.obj.separateText(spanReviewedText);
             //fill in any references to variables in the text with the actual value. Ex: "Hi, my name is {name}!"
             let before = replaceBracketValues(result.before);
             let after = replaceBracketValues(result.after);

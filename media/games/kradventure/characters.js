@@ -7,32 +7,33 @@ function Node(id, text, player_choices, events = []){
     this.player_choices = player_choices;
     //this will be some event that is fired immediately, could be an event to start a quest, or literally anything, as long as the right event listener is present
     this.events = events; 
-    this.separateText = function(){
+    this.separateText = function(txt = this.text){
         //this function checks for text WITH <p> tags that may be mixed with text WITHOUT <p> tags
         //if the text starts with a <p> tag, don't add any additonal styling - it's assumed other styling is being applied and it might not be dialogue
         //Isolate all text that is enclosed in adjacent <p> tags and display it before the image. 
         //Once text appears WITHOUT a <p> tag, it is considered dialogue and displayed after the image. Any text after dialogue that is in <p> tags will display beneath the speech bubble.
+            let nodeText = txt;
             let indexOfTagEnd = 0;
             let before =''; //the string of text that will display before the images
             let after =''; //the string of text that will display after the images
             
-            if(this.text.startsWith('<p>')){
+            if(nodeText.startsWith('<p>')){
                 
                 
                 //split based on all closed <p> tags
-                let split = this.text.split('</p>');
+                let split = nodeText.split('</p>');
                 for(var i=0; i<split.length; i++){
                     if(!split[i].startsWith('<p>')){
-                       indexOfTagEnd = nthIndex(this.text, "</p>", i);
+                       indexOfTagEnd = nthIndex(nodeText, "</p>", i);
                        break;
                     }
                 }
                
-              before = this.text.substring(0, indexOfTagEnd+4);
-              after = this.text.substring(indexOfTagEnd+4);
+              before = nodeText.substring(0, indexOfTagEnd+4);
+              after = nodeText.substring(indexOfTagEnd+4);
                 
             }else{
-                after = this.text.trim();
+                after = nodeText.trim();
             } 
         //console.log(`----SEPERATE TEXT: before: ${before} -- after: ${after}`);
         return {before, after};
@@ -606,7 +607,7 @@ betty.nodes = [
     new Node('1300', 'Fruit samsams are fresh fruit wrapped in dough, then fried. Wow, are they good!', [new NodeChoice('I agree - that sounds awesome.', 1310),new NodeChoice('I dunno...could be gross...', 1200)]),
     new Node('1310', 'Hey, I forgot - I\'ve got an extra fruit samsam right here, would you like it?', [new NodeChoice('Sure!', 1311),new NodeChoice('Nah, I\'m good...', 0002)]),
     new Node('1311', 'Here you go!', [new NodeChoice('Thanks!', 0002)],[{evtname:'itemevent', detail:{id: "fruitsamsam", title: "Fruit Samsam", desc: "A lovely fried pastry filled with fruit.", amount:1}}, {evtname:'poievent', detail:{id: "samsam"}}]),
-    new Node('2000', 'I\'ve lived here so long, I don\'t really remember, but it was not too long after Wacky Wally showed up. That\'s when I founded the Jabbering Jackelope.', [new NodeChoice('Who\'s Wacky Wally?', 2100),new NodeChoice('The Jabbering WHAT...?', 2200)]),
+    new Node('2000', '<content keyword="stick<1,fruitsamsam<1">You don\'t have a stick OR a samsam!</content><content keyword="fruitsamsam">Hey {gameplayer.name}, did you like your fruit samsam?</content> I\'ve lived here so long, I don\'t really remember, but it was not too long after Wacky Wally showed up. <content keyword="stick>0">You\'ve got a stick!</content> That\'s when I founded the Jabbering Jackelope.', [new NodeChoice('Who\'s Wacky Wally?', 2100),new NodeChoice('The Jabbering WHAT...?', 2200)]),
     new Node('2100', 'Oh, you don\'t know Wally? He\'s old school! And actually old! He founded Whodiddle. He definitely knows a thing or seven about the town and the surrounding areas...', [new NodeChoice('Interesting...thanks!', 0002)]),
     new Node('2200', 'The Jabbering Jackelope is the tavern I created near the middle of Whodiddle. A fine establishment! Not like that savage Rocco\'s Rowdy Pub!', [new NodeChoice('I will check it out!', 0002)]),
     new Node('3000', 'Well, I\'m ALWAYS going to mention the Jabbering Jackelope, because I own the place! But Wally\'s Fun Shop is also essential to this town. If you\'re into nature, a stroll through the Whateverest Forest might be your thing!', [new NodeChoice('The Jabbering WHAT...?', 2200),new NodeChoice('Wally\'s Fun Shop?', 3100),new NodeChoice('How do I get to the Whateverest Forest?', 3200)]),

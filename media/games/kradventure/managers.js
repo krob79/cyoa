@@ -472,7 +472,7 @@ class Manager{
         this.promptObj = {};
         this.promptObjPropertyString = '';
         this.range = 9;
-        this.nodeRedirects = [];
+        this.nodeRedirects = [{from:'1000,betty',to:'6666,bob',keyword:'fruitsamsam>0', amount:2}];
     }
     get currentImageMarkup(){
         //this builds the tags for the location background and character background, if any
@@ -492,6 +492,57 @@ class Manager{
 
         return imageMarkup;
     }
+    reviewSpanTags(str){
+        const regex = /<content keyword=(["'])([\w!><,\s]+)(\1)>([\w!?,.{}'"\s]+)<\/content>/g;
+        let m;
+        let results = [];
+        let newstr = '';
+
+        while ((m = regex.exec(str)) !== null) {
+            console.log("---checking for SPAN tags....");
+            // This is necessary to avoid infinite loops with zero-width matches
+            if (m.index === regex.lastIndex) {
+                regex.lastIndex++;
+            }
+
+            let obj = {content:'',keyword:'',text:''};
+
+            // The result can be accessed through the `m`-variable.
+            m.forEach((match, groupIndex) => {
+                console.log(`Found match, group ${groupIndex}: ${match}`);
+                switch(groupIndex){
+                    case 0:
+                      obj.content = match;
+                      break;
+                    case 2:
+                      obj.keyword = match;
+                      break;
+                    case 4:
+                      obj.text = match;
+                      break;
+                }
+            });
+
+            results.push(obj);
+        }
+        
+        //for each tag that was found, verify the keyword
+        //if keyword found, replace the whole tag with just its text contents
+        //if keyword was not found, replace the whole tag with nothing
+        let replacement = '';
+        for(var i=0; i< results.length; i++){
+            if(this.checkPOI(results[i].keyword)){
+               replacement = results[i].text;
+            }else{
+               replacement = '';
+            }
+            newstr = str.replace(results[i].content, replacement);
+            
+            str = newstr.trim();
+        }
+
+        return str;
+    }
     checkForRedirects(nodeToLoad){
         //console.log(`--checking for redirects: ${nodeToLoad}`);
         //the travelManager's redirect list is global, so it will always have both a node value and an object comma separated
@@ -503,7 +554,16 @@ class Manager{
         }else{
             convertedNodeValue = nodeToLoad;
         }
-        let result = this.nodeRedirects.filter((obj)=>obj.from==convertedNodeValue);
+        
+        //grab redirects with no keywords
+        let plainRedirects = this.nodeRedirects.filter(r => r.keyword == undefined);
+        //grab redirects with keywords that return true
+        let keywordRedirects = this.nodeRedirects.filter(r => {return this.checkPOI(r.keyword)});
+        //combine both groups, then filter on the obj.from value
+        let combined = [...plainRedirects, ...keywordRedirects];
+        let result = combined.filter((obj)=>obj.from==convertedNodeValue);
+        
+        console.log(`REDIRECTS - Plain: ${plainRedirects.length}, Keyword: ${keywordRedirects.length}, Actual Detected: ${result.length}`);
         
         if(result.length > 0){
             let resultTxt = this.reduceRedirects(this.nodeRedirects, result[0].to);
@@ -663,6 +723,9 @@ class Manager{
     //However, this might be also be used for the redirects as well
     checkPOI(poi){ 
         //console.log("---checking POI: " + poi);
+        if(!poi){
+           return false;
+        }
         let allPOIs = [];
         let poiIsValid = true; //true until proven false
         //if poi has a comma, it means there's more than one, so separate them into an array 

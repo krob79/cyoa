@@ -313,8 +313,8 @@ async function typeSentence(sentence, eleRef, speed = 50, controller = effectCon
   let letters = sentence.split("");
   let i = 0;
   while(i < letters.length) {
+      await waitForMs(speed);
       if(controller.active){
-         await waitForMs(speed);
          lastEl.append(letters[i]);
          i++
       }else{
